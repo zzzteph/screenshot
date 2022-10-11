@@ -59,7 +59,9 @@ The application will visit **https://google.com**, wait 5 seconds for all Javasc
 You will be able to find **google.com.png** image in the folder. You can specify the path where you want to store the image.
 
 
-
+<p align="center">
+  <img src="https://github.com/zzzteph/screenshot/blob/main/google.com.png?raw=true">
+</p>
 
 
 
