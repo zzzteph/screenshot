@@ -34,7 +34,7 @@ public class App {
         String screenshot = "";
 		String source = "";
 
-		        ChromeOptions chromeOptions = new ChromeOptions();
+		ChromeOptions chromeOptions = new ChromeOptions();
         chromeOptions.addArguments("--headless");
         chromeOptions.addArguments("--no-sandbox");
         chromeOptions.addArguments("--disable-popup-blocking");
@@ -59,13 +59,6 @@ public class App {
         SourceOption.setRequired(false);
         options.addOption(SourceOption);
 
-        Option cookiesOption = Option.builder("c")
-                .longOpt("cookies")
-                .argName("cookies")
-                .hasArgs()
-                .desc("Set cookies")
-                .build();
-        options.addOption(cookiesOption);
 
         CommandLineParser parser = new DefaultParser();
         HelpFormatter formatter = new HelpFormatter();
@@ -73,26 +66,9 @@ public class App {
         try {
             // Parse the command-line arguments
            CommandLine cmd = parser.parse(options, args);
-
-
-            // Get the values of the options
             url = cmd.getOptionValue("u");
 			source = cmd.getOptionValue("c");
 			screenshot = cmd.getOptionValue("d");
-            if (cmd.getOptionValues("c") != null) {
-           
-                for (String cookie : cmd.getOptionValues("c")) {
-					
-					
-					
-					String[] cookieVals = cookie.split("=", 2);
-				   driver.manage().addCookie( new Cookie(cookieVals[0], cookieVals[1]));
-					
-                }
-            }
-
-            // Add your logic to handle the options as needed
-            // ...
 
         } catch (Exception e) {
             System.out.println(e.getMessage());
