@@ -99,7 +99,7 @@ public class App {
 		
 		 for (String header : header_list)
 		 {
-			 chromeOptions.addArguments("--header="+header);
+			 chromeOptions.addArguments(header);
 			
 		 }
 		
