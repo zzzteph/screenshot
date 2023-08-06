@@ -19,7 +19,12 @@ import java.io.InputStreamReader;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.FileReader;
-
+import org.apache.commons.cli.CommandLine;
+import org.apache.commons.cli.CommandLineParser;
+import org.apache.commons.cli.DefaultParser;
+import org.apache.commons.cli.Option;
+import org.apache.commons.cli.Options;
+import org.apache.commons.cli.ParseException;
 import java.util.*;
 import java.io.FileWriter;
 import java.io.BufferedWriter;
@@ -62,7 +67,8 @@ public class App {
 
         try {
             // Parse the command-line arguments
-            CommandLineParser cmd = parser.parse(options, args);
+           CommandLine cmd = parser.parse(options, args);
+
 
             // Get the values of the options
             url = cmd.getOptionValue("u");
