@@ -136,7 +136,7 @@ catch(Exception e)
         chromeOptions.addArguments("--window-size=1920,1080");
         chromeOptions.addArguments("--log-level=3");
         chromeOptions.addArguments("--silent");
-		options.addArguments("--custom-header1=header_value1");
+		chromeOptions.addArguments("--custom-header1=header_value1");
 		
 		
 		
