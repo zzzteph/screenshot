@@ -27,7 +27,8 @@ import org.apache.commons.cli.*;
 public class App {
 
     public static void main(String[] args) {
-
+        System.setProperty("webdriver.chrome.driver", "/usr/bin/chromedriver");
+        System.setProperty("webdriver.chrome.silentOutput", "true");
         String url = "";
         String screenshot = "";
 		String source = "";
@@ -73,7 +74,7 @@ public class App {
             if (headers != null) {
            
                 for (String header : headers) {
-                    System.out.println(header);
+                   
 					header_list.add(header);
                 }
             }
@@ -87,10 +88,33 @@ public class App {
             System.exit(1);
         }
 
+        ChromeOptions chromeOptions = new ChromeOptions();
+        chromeOptions.addArguments("--headless");
+        chromeOptions.addArguments("--no-sandbox");
+        chromeOptions.addArguments("--disable-popup-blocking");
+        chromeOptions.addArguments("--ignore-certificate-errors");
+        chromeOptions.addArguments("--window-size=1920,1080");
+        chromeOptions.addArguments("--log-level=3");
+        chromeOptions.addArguments("--silent");
+		
+		 for (String header : header_list)
+		 {
+			 chromeOptions.addArguments("--header="+header);
+			
+		 }
+		
+		
+		WebDriver driver = new ChromeDriver(chromeOptions);
+		try{
+        request(driver,url);
+		takeScreenshot(driver, screenshot);
+	    getSource(driver, source);
 
-
-        makeAction(url, screenshot,source);
-
+        } catch (Exception e) {
+            System.out.println(e);
+            driver.quit();
+            return false;
+        }
         return;
     }
 
@@ -124,43 +148,16 @@ catch(Exception e)
 
 
 
-    public static boolean makeAction(String url, String screenshot,String source) {
+    public static boolean request(WebDriver driver,String url) {
         System.setProperty("webdriver.chrome.driver", "/usr/bin/chromedriver");
         System.setProperty("webdriver.chrome.silentOutput", "true");
         java.util.logging.Logger.getLogger("org.openqa.selenium").setLevel(java.util.logging.Level.OFF);
-        ChromeOptions chromeOptions = new ChromeOptions();
-        chromeOptions.addArguments("--headless");
-        chromeOptions.addArguments("--no-sandbox");
-        chromeOptions.addArguments("--disable-popup-blocking");
-        chromeOptions.addArguments("--ignore-certificate-errors");
-        chromeOptions.addArguments("--window-size=1920,1080");
-        chromeOptions.addArguments("--log-level=3");
-        chromeOptions.addArguments("--silent");
-		chromeOptions.addArguments("--custom-header1=header_value1");
-		
-		
-		
-        WebDriver driver = new ChromeDriver(chromeOptions);
+        driver.manage().timeouts().pageLoadTimeout(10, TimeUnit.SECONDS);
+        driver.manage().timeouts().setScriptTimeout(10, TimeUnit.SECONDS);
+        driver.manage().timeouts().implicitlyWait(10, TimeUnit.SECONDS);
+		driver.get(url);
+        Thread.sleep(10000);
 
-        try {
-            driver.manage().timeouts().pageLoadTimeout(10, TimeUnit.SECONDS);
-            driver.manage().timeouts().setScriptTimeout(10, TimeUnit.SECONDS);
-            driver.manage().timeouts().implicitlyWait(10, TimeUnit.SECONDS);
-
-			
-	      driver.get(url);
-          Thread.sleep(10000);
-          takeScreenshot(driver, screenshot);
-	      getSource(driver, source);
-               	
-
-        } catch (Exception e) {
-            System.out.println(e);
-            driver.quit();
-            return false;
-        }
-        driver.quit();
-        return true;
 
     }
 
