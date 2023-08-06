@@ -81,7 +81,7 @@ public class App {
             // Add your logic to handle the options as needed
             // ...
 
-        } catch (ParseException e) {
+        } catch (Exception e) {
             System.out.println(e.getMessage());
             formatter.printHelp("utility-name", options);
             System.exit(1);
