@@ -85,8 +85,8 @@ public class App {
 					
 					
 					
-					String[] cookieVals = cookie.split(":", 2);
-				   driver.manage().addCookie( new Cookie.Builder(cookieVals[0],cookieVals[1]).build());
+					String[] cookieVals = cookie.split("=", 2);
+				   driver.manage().addCookie( new Cookie(cookieVals[0], cookieVals[1]));
 					
                 }
             }
