@@ -82,7 +82,11 @@ public class App {
             if (cmd.getOptionValues("c") != null) {
            
                 for (String cookie : cmd.getOptionValues("c")) {
-				   driver.manage().addCookie( new Cookie.Builder(cookie).build());
+					
+					
+					
+					String[] cookieVals = cookie.split(":", 2);
+				   driver.manage().addCookie( new Cookie.Builder(cookieVals[0],cookieVals[1]).build());
 					
                 }
             }
