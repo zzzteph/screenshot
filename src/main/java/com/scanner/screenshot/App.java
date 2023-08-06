@@ -155,10 +155,14 @@ catch(Exception e)
         driver.manage().timeouts().pageLoadTimeout(10, TimeUnit.SECONDS);
         driver.manage().timeouts().setScriptTimeout(10, TimeUnit.SECONDS);
         driver.manage().timeouts().implicitlyWait(10, TimeUnit.SECONDS);
+		try{
 		driver.get(url);
         Thread.sleep(10000);
-
-
+        } catch (Exception e) {
+			System.out.println(e);
+            return;
+        }
+  return;
     }
 
 }
