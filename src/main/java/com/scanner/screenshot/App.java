@@ -44,8 +44,6 @@ public class App {
         chromeOptions.addArguments("--silent");
 		WebDriver driver = new ChromeDriver(chromeOptions);
 		 Options options = new Options();
-		
-		System.out.println("New"); 
        
         Option HostInput = new Option("u", "url", true, "url");
         HostInput.setRequired(false);
@@ -77,12 +75,19 @@ public class App {
         }
 
 		
-		
+		if(url==null)
+		{
+			 formatter.printHelp("utility-name", options);
+            System.exit(1);
+		}
 		
 		try{
-        request(driver,url);
-		takeScreenshot(driver, screenshot);
-	    getSource(driver, source);
+        
+		request(driver,url);
+		if(screenshot!=null)
+			takeScreenshot(driver, screenshot);
+		if(source!=null)
+			getSource(driver, source);
 
         } catch (Exception e) {
             System.out.println(e);
