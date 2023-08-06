@@ -148,7 +148,7 @@ catch(Exception e)
 
 
 
-    public static boolean request(WebDriver driver,String url) {
+    public static void request(WebDriver driver,String url) {
         System.setProperty("webdriver.chrome.driver", "/usr/bin/chromedriver");
         System.setProperty("webdriver.chrome.silentOutput", "true");
         java.util.logging.Logger.getLogger("org.openqa.selenium").setLevel(java.util.logging.Level.OFF);
