@@ -10,7 +10,6 @@ import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.OutputType;
 import org.openqa.selenium.TakesScreenshot;
 import org.openqa.selenium.By;
-import java.util.Iterator;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
@@ -19,10 +18,9 @@ import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.io.FileReader;
 import java.io.IOException;
-import java.util.Map;
 import java.io.FileReader;
-import java.util.Iterator;
-import java.util.Random;
+
+import java.util.*;
 import java.io.FileWriter;
 import java.io.BufferedWriter;
 import org.apache.commons.cli.*;
@@ -33,10 +31,16 @@ public class App {
         String url = "";
         String screenshot = "";
 		String source = "";
-        Options options = new Options();
+		List<String> header_list=new ArrayList();
+		
+		 Options options = new Options();
+		
+		
+       
         Option HostInput = new Option("u", "url", true, "url");
         HostInput.setRequired(false);
         options.addOption(HostInput);
+		
         Option ScreenShotInput = new Option("s", "screenshot", true, "screenshot");
         ScreenShotInput.setRequired(false);
         options.addOption(ScreenShotInput);
@@ -45,20 +49,45 @@ public class App {
         SourceOption.setRequired(false);
         options.addOption(SourceOption);
 
+        Option headerOption = Option.builder("h")
+                .longOpt("headers")
+                .argName("headers")
+                .hasArgs()
+                .desc("Set repeatable headers")
+                .build();
+        options.addOption(headerOption);
+
         CommandLineParser parser = new DefaultParser();
         HelpFormatter formatter = new HelpFormatter();
-        try {
-            CommandLine cmd;
 
-            cmd = parser.parse(options, args);
-            url = cmd.getOptionValue("url");
-            screenshot = cmd.getOptionValue("screenshot");
-	    source = cmd.getOptionValue("source");
-        } catch (Exception e) {
+        try {
+            // Parse the command-line arguments
+            CommandLineParser cmd = parser.parse(options, args);
+
+            // Get the values of the options
+            url = cmd.getOptionValue("u");
+			source = cmd.getOptionValue("c");
+			screenshot = cmd.getOptionValue("s");
+            String[] headers = cmd.getOptionValues("h");
+            if (headers != null) {
+           
+                for (String header : headers) {
+                    System.out.println(header);
+					header_list.add(header);
+                }
+            }
+
+            // Add your logic to handle the options as needed
+            // ...
+
+        } catch (ParseException e) {
             System.out.println(e.getMessage());
             formatter.printHelp("utility-name", options);
             System.exit(1);
         }
+
+
+
         makeAction(url, screenshot,source);
 
         return;
@@ -83,8 +112,9 @@ catch(Exception e)
     public static void takeScreenshot(WebDriver driver, String screenshot) {
 
         File src = ((TakesScreenshot) driver).getScreenshotAs(OutputType.FILE);
+		File output=new File(screenshot);
         try {
-            FileUtils.copyFile(src, new File(screenshot));
+            FileUtils.copyFile(src, output);
         } catch (IOException e) {
 
             e.printStackTrace();
@@ -105,6 +135,10 @@ catch(Exception e)
         chromeOptions.addArguments("--window-size=1920,1080");
         chromeOptions.addArguments("--log-level=3");
         chromeOptions.addArguments("--silent");
+		options.addArguments("--custom-header1=header_value1");
+		
+		
+		
         WebDriver driver = new ChromeDriver(chromeOptions);
 
         try {
@@ -114,8 +148,8 @@ catch(Exception e)
 
 			
 	      driver.get(url);
-              Thread.sleep(5000);
-              takeScreenshot(driver, screenshot);
+          Thread.sleep(10000);
+          takeScreenshot(driver, screenshot);
 	      getSource(driver, source);
                	
 
