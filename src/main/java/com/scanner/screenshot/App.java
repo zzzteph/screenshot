@@ -32,7 +32,7 @@ public class App {
         String url = "";
         String screenshot = "";
 		String source = "";
-		List<String> header_list=new ArrayList();
+
 		        ChromeOptions chromeOptions = new ChromeOptions();
         chromeOptions.addArguments("--headless");
         chromeOptions.addArguments("--no-sandbox");
@@ -41,6 +41,7 @@ public class App {
         chromeOptions.addArguments("--window-size=1920,1080");
         chromeOptions.addArguments("--log-level=3");
         chromeOptions.addArguments("--silent");
+		WebDriver driver = new ChromeDriver(chromeOptions);
 		 Options options = new Options();
 		
 		System.out.println("New"); 
@@ -53,17 +54,17 @@ public class App {
         ScreenShotInput.setRequired(false);
         options.addOption(ScreenShotInput);
 
-        Option SourceOption = new Option("c", "source", true, "source");
+        Option SourceOption = new Option("d", "source", true, "source");
         SourceOption.setRequired(false);
         options.addOption(SourceOption);
 
-        Option headerOption = Option.builder("h")
-                .longOpt("headers")
-                .argName("headers")
+        Option cookiesOption = Option.builder("c")
+                .longOpt("cookies")
+                .argName("cookies")
                 .hasArgs()
-                .desc("Set repeatable headers")
+                .desc("Set cookies")
                 .build();
-        options.addOption(headerOption);
+        options.addOption(cookiesOption);
 
         CommandLineParser parser = new DefaultParser();
         HelpFormatter formatter = new HelpFormatter();
@@ -76,13 +77,11 @@ public class App {
             // Get the values of the options
             url = cmd.getOptionValue("u");
 			source = cmd.getOptionValue("c");
-			screenshot = cmd.getOptionValue("s");
-            String[] headers = cmd.getOptionValues("h");
-            if (headers != null) {
+			screenshot = cmd.getOptionValue("d");
+            if (cmd.getOptionValues("c") != null) {
            
-                for (String header : headers) {
-                   chromeOptions.addArguments(header);
-				   System.out.println(header);
+                for (String cookie : cmd.getOptionValues("c")) {
+				   driver.manage().addCookie( new Cookie.Builder(cookie).build());
 					
                 }
             }
@@ -98,7 +97,7 @@ public class App {
 
 		
 		
-		WebDriver driver = new ChromeDriver(chromeOptions);
+		
 		try{
         request(driver,url);
 		takeScreenshot(driver, screenshot);
