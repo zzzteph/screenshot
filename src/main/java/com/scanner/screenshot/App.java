@@ -33,7 +33,14 @@ public class App {
         String screenshot = "";
 		String source = "";
 		List<String> header_list=new ArrayList();
-		
+		        ChromeOptions chromeOptions = new ChromeOptions();
+        chromeOptions.addArguments("--headless");
+        chromeOptions.addArguments("--no-sandbox");
+        chromeOptions.addArguments("--disable-popup-blocking");
+        chromeOptions.addArguments("--ignore-certificate-errors");
+        chromeOptions.addArguments("--window-size=1920,1080");
+        chromeOptions.addArguments("--log-level=3");
+        chromeOptions.addArguments("--silent");
 		 Options options = new Options();
 		
 		System.out.println("New"); 
@@ -74,8 +81,9 @@ public class App {
             if (headers != null) {
            
                 for (String header : headers) {
-                   
-					header_list.add(header);
+                   chromeOptions.addArguments(header);
+				   System.out.println(header);
+					
                 }
             }
 
@@ -88,20 +96,6 @@ public class App {
             System.exit(1);
         }
 
-        ChromeOptions chromeOptions = new ChromeOptions();
-        chromeOptions.addArguments("--headless");
-        chromeOptions.addArguments("--no-sandbox");
-        chromeOptions.addArguments("--disable-popup-blocking");
-        chromeOptions.addArguments("--ignore-certificate-errors");
-        chromeOptions.addArguments("--window-size=1920,1080");
-        chromeOptions.addArguments("--log-level=3");
-        chromeOptions.addArguments("--silent");
-		
-		 for (String header : header_list)
-		 {
-			 chromeOptions.addArguments(header);
-			
-		 }
 		
 		
 		WebDriver driver = new ChromeDriver(chromeOptions);
