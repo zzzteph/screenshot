@@ -1,147 +1,98 @@
 package com.scanner.screenshot;
-import java.io.IOException;
-import org.apache.commons.io.FileUtils;
-import java.util.concurrent.TimeUnit;
-import java.io.File;
-import org.openqa.selenium.*;
-import org.openqa.selenium.WebDriver;
-import org.openqa.selenium.WebElement;
-import org.openqa.selenium.chrome.ChromeOptions;
-import org.openqa.selenium.chrome.ChromeDriver;
-import org.openqa.selenium.OutputType;
-import org.openqa.selenium.TakesScreenshot;
-import org.openqa.selenium.By;
-import org.json.simple.JSONArray;
-import org.json.simple.JSONObject;
-import org.json.simple.parser.JSONParser;
-import org.json.simple.parser.ParseException;
-import java.io.BufferedReader;
-import java.io.InputStreamReader;
-import java.io.FileReader;
-import java.io.IOException;
-import java.io.FileReader;
 
-import java.util.*;
-import java.io.FileWriter;
-import java.io.BufferedWriter;
+import org.apache.commons.io.FileUtils;
+import org.openqa.selenium.*;
+import org.openqa.selenium.chrome.ChromeDriver;
+import org.openqa.selenium.chrome.ChromeOptions;
 import org.apache.commons.cli.*;
+
+import java.io.*;
+import java.util.concurrent.TimeUnit;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
 public class App {
 
     public static void main(String[] args) {
+        // Suppress Selenium logs
+        Logger.getLogger("org.openqa.selenium").setLevel(Level.OFF);
+
         System.setProperty("webdriver.chrome.driver", "/usr/bin/chromedriver");
-        System.setProperty("webdriver.chrome.silentOutput", "true");
-        String url = "";
-        String screenshot = "";
-		String source = "";
+        ChromeOptions chromeOptions = new ChromeOptions();
+        chromeOptions.addArguments("--headless", "--no-sandbox", "--disable-popup-blocking",
+                "--ignore-certificate-errors", "--window-size=1920,1080", "--log-level=3", "--silent");
 
-		ChromeOptions chromeOptions = new ChromeOptions();
-        chromeOptions.addArguments("--headless");
-        chromeOptions.addArguments("--no-sandbox");
-        chromeOptions.addArguments("--disable-popup-blocking");
-        chromeOptions.addArguments("--ignore-certificate-errors");
-        chromeOptions.addArguments("--window-size=1920,1080");
-        chromeOptions.addArguments("--log-level=3");
-        chromeOptions.addArguments("--silent");
-		WebDriver driver = new ChromeDriver(chromeOptions);
-		 Options options = new Options();
-       
-        Option HostInput = new Option("u", "url", true, "url");
-        HostInput.setRequired(false);
-        options.addOption(HostInput);
-		
-        Option ScreenShotInput = new Option("s", "screenshot", true, "screenshot");
-        ScreenShotInput.setRequired(false);
-        options.addOption(ScreenShotInput);
+        WebDriver driver = new ChromeDriver(chromeOptions);
+        Options options = createOptions();
 
-        Option SourceOption = new Option("d", "source", true, "source");
-        SourceOption.setRequired(false);
-        options.addOption(SourceOption);
+        CommandLine cmd = null;
+        try {
+            cmd = new DefaultParser().parse(options, args);
+        } catch (ParseException e) {
+            new HelpFormatter().printHelp("utility-name", options);
+            System.exit(1);
+        }
 
-
-        CommandLineParser parser = new DefaultParser();
-        HelpFormatter formatter = new HelpFormatter();
+        String url = cmd.getOptionValue("url");
+        if (url == null) {
+            new HelpFormatter().printHelp("utility-name", options);
+            System.exit(1);
+        }
 
         try {
-            // Parse the command-line arguments
-           CommandLine cmd = parser.parse(options, args);
-            url = cmd.getOptionValue("u");
-			source = cmd.getOptionValue("c");
-			screenshot = cmd.getOptionValue("d");
+            request(driver, url);
 
+            if (cmd.hasOption("screenshot")) {
+                takeScreenshot(driver, cmd.getOptionValue("screenshot"));
+            }
+
+            if (cmd.hasOption("source")) {
+                getSource(driver, cmd.getOptionValue("source"));
+            }
         } catch (Exception e) {
-            System.out.println(e.getMessage());
-            formatter.printHelp("utility-name", options);
-            System.exit(1);
-        }
-
-		
-		if(url==null)
-		{
-			 formatter.printHelp("utility-name", options);
-            System.exit(1);
-		}
-		
-		try{
-        
-		request(driver,url);
-		if(screenshot!=null)
-			takeScreenshot(driver, screenshot);
-		if(source!=null)
-			getSource(driver, source);
-
-        } catch (Exception e) {
-            System.out.println(e);
+            e.printStackTrace();
+        } finally {
             driver.quit();
-            return;
         }
-        return;
     }
 
+    private static Options createOptions() {
+        Options options = new Options();
+        options.addOption(Option.builder("u").longOpt("url").hasArg().desc("URL to capture").build());
+        options.addOption(Option.builder("s").longOpt("screenshot").hasArg().desc("File to save screenshot").build());
+        options.addOption(Option.builder("d").longOpt("source").hasArg().desc("File to save HTML source").build());
+        return options;
+    }
 
-   public static void getSource(WebDriver driver,String source)
-   {
-try 
-{
-    BufferedWriter writer = new BufferedWriter(new FileWriter(source));
-    writer.write(driver.getPageSource());
-    
-    writer.close();
-}
-catch(Exception e)
-{
-}
-
-   } 
-
-    public static void takeScreenshot(WebDriver driver, String screenshot) {
-
-        File src = ((TakesScreenshot) driver).getScreenshotAs(OutputType.FILE);
-		File output=new File(screenshot);
-        try {
-            FileUtils.copyFile(src, output);
+    public static void getSource(WebDriver driver, String source) {
+        try (BufferedWriter writer = new BufferedWriter(new FileWriter(source))) {
+            writer.write(driver.getPageSource());
         } catch (IOException e) {
-
             e.printStackTrace();
         }
     }
 
+    public static void takeScreenshot(WebDriver driver, String screenshot) {
+        File src = ((TakesScreenshot) driver).getScreenshotAs(OutputType.FILE);
+        File output = new File(screenshot);
+        try {
+            FileUtils.copyFile(src, output);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
 
-
-    public static void request(WebDriver driver,String url) {
-        System.setProperty("webdriver.chrome.driver", "/usr/bin/chromedriver");
-        System.setProperty("webdriver.chrome.silentOutput", "true");
-        java.util.logging.Logger.getLogger("org.openqa.selenium").setLevel(java.util.logging.Level.OFF);
+    public static void request(WebDriver driver, String url) {
         driver.manage().timeouts().pageLoadTimeout(10, TimeUnit.SECONDS);
         driver.manage().timeouts().setScriptTimeout(10, TimeUnit.SECONDS);
         driver.manage().timeouts().implicitlyWait(10, TimeUnit.SECONDS);
-		try{
-		driver.get(url);
-        Thread.sleep(10000);
-        } catch (Exception e) {
-			System.out.println(e);
-            return;
+        try {
+            driver.get(url);
+            Thread.sleep(10000); // This is to wait for page to load, which might not be the best approach
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt(); // Restore interrupted status
+        } catch (WebDriverException e) {
+            System.out.println(e.getMessage());
         }
-  return;
     }
-
 }
