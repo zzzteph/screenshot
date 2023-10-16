@@ -10,7 +10,7 @@ Java selenium project that utilizes chrome driver with the only purpose of takin
 
 - Install Docker
 - Pull the Docker image by running ```docker pull zzzteph/screenshot```
-- Run ```docker run -v /root/:/screenshot/target zzzteph/screenshot -u "http://google.com" -s "/screenshot/target/google.png"```
+- Run ```docker run -v /tmp:/tmp zzzteph/screenshot -u "http://google.com" -s "/tmp/google.png"```
 
 
 
